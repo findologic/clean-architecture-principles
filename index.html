@@ -1,0 +1,602 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+
+    <title>Clean Architecture Principles</title>
+
+    <link href="css/reset.css" rel="stylesheet">
+    <link href="css/reveal.css" rel="stylesheet">
+    <link href="css/theme/findologic.css" rel="stylesheet">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link href="lib/css/monokai.css" rel="stylesheet">
+
+    <!-- Printing and PDF exports -->
+    <script>
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+</head>
+<body>
+<div class="reveal">
+    <div class="footer-bar"></div>
+    <div class="slides">
+        <section>
+            <section data-markdown data-background="images/galaxy.jpg" class="title-slide">
+                <textarea data-template>
+                    # Clean Architecture Principles
+                </textarea>
+            </section>
+        </section>
+
+        <section>
+            <section data-markdown>
+                <textarea data-template>
+                    # Agenda
+
+                    1. What is clean architecture?
+                    3. The evolution of programming paradigms.
+                    4. Principles.
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## `$ whoami`
+
+                    ![who am I](images/whoami.jpg)
+
+                    github.com/howard
+                </textarea>
+            </section>
+        </section>
+
+        <section>
+            <section class="why-slide" data-background="black">
+                <h1>What is clean architecture?</h1>
+
+                <video autoplay loop>
+                    <source data-src="images/why.mp4" type="video/mp4">
+                </video>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## The two values of software
+
+                    ![criteria](images/criteria2.svg)
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## The two ~values of~ requirements for software
+
+                    ![criteria](images/criteria.svg)
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## Who is it for?
+
+                    ![products](images/castle.jpg)
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## Who can live without it?
+
+                    ![experiments](images/playhouse.jpg)
+                </textarea>
+            </section>
+        </section>
+
+
+        <section>
+            <section data-markdown data-background="images/evolution.jpg" data-background-size="contain" class="title-slide">
+                <textarea data-template>
+                    # The evolution of programming paradigms
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## Structured programming
+
+                    * `if` statements.
+                    * Loops.
+                    * Function calls.
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## Structured programming
+
+                    >Structured programming imposes discipline on the direct transfer of control.
+
+                    --Uncle Bob
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## Structured programming
+
+                    No example. There is no `goto` in TypeScript.
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## Object-oriented programming (OOP)
+
+                    * Encapsulation.
+                    * Inheritance.
+                    * Polymorphism.
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## OOP
+
+                    >Object-oriented programming imposes discipline on the *indirect* transfer of control.
+
+                    --Uncle Bob
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## OOP - problem
+
+                    ```
+                    const eCommerceSystem: string = 'Shopware';
+                    let data: string[];
+
+                    switch (eCommerceSystem) {
+                        case 'Shopware':
+                            const exporter = new ShopwareExporter();
+                            data = exporter.getFeed();
+                            break;
+                        case 'Magento':
+                            const incompatibleFormat = getMagentoData();
+                            data = makeFeedCompatible(incompatibleFormat);
+                            break;
+                        // etc.
+                    }
+                    ```
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## OOP - solution
+
+                    ```
+                    abstract class Exporter {
+                        abstract export(): DataFeed;
+
+                        static getInstance(eCommerceSystem: string): DataFeed {
+                            switch (eCommerceSystem) {
+                                case 'Shopware':
+                                    return new ShopwareExporter();
+                                case 'Magento':
+                                    return new MagentoExporter();
+                                // etc.
+                            }
+                        }
+                    }
+
+                    class ShopwareExporter extends Exporter {
+                        // ...
+                    }
+
+                    class MagentoExporter extends Exporter {
+                        // ...
+                    }
+
+                    const eCommerceSystem: string = 'Shopware';
+                    const data = Exporter.getInstance(eCommerceSystem)
+                        .export();
+                    ```
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## Functional programming
+
+                    * Pure functions.
+                    * Higher order functions.
+                    * Immutability.
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## Functional programming
+
+                    >Functional programming imposes discipline upon assignment.
+
+                    --Uncle Bob
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## Functional programming - problem
+
+                    ```
+                    let sensorData: number = readSensor();
+                    sensorData = (sensorData - MIN_SENSOR_VALUE) / SENSOR_RANGE;
+                    sensorData = sensorData * 100;
+
+                    // Some stuff happening...
+
+                    console.log(sensorData);
+                    ```
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## Functional programming - solution
+
+                    ```
+                    const sensorData: number = readSensor();
+                    const normalizedSensorData = sensorData - MIN_SENSOR_VALUE;
+                    const sensorDataRatio =  normalizedSensorData / SENSOR_RANGE;
+                    const sensorDataPercent = sensorDataRatio * 100;
+
+                    // Some stuff happening...
+
+                    console.log(sensorData);
+                    ```
+                </textarea>
+            </section>
+        </section>
+
+        <section>
+            <section data-markdown data-background="images/space.jpg" class="white-heading" >
+                <textarea data-template>
+                    # Principles
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## SOLID
+
+                    * **S**ingle responsibility principle.
+                    * **O**pen/closed principle.
+                    * **L**iskov substitution principle.
+                    * **I**nterface segregation principle.
+                    * **D**ependency inversion principle.
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## Single responsibility principle (SRP)
+
+                    >A module should be responsible to one, and only one actor.
+
+                    --Uncle Bob
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## SRP - problem
+
+                    ```
+                    class Employee {
+                        constructor(public employeeData: object) {}
+                        // Needed by accounting:
+                        calculatePay(): number { /* ... */ }
+                        // Needed by HR:
+                        calculateHours(): number { /* ... */ }
+                        // Needed by manager:
+                        fire(): void { /* ... */ }
+                    }
+                    ```
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## SRP - solution
+
+                    ```
+                    class Employee {
+                        constructor(public employeeData: object) {}
+                    }
+
+                    class PayrollCalculator {
+                        calculatePay(employee: Employee): number { /* ... */ }
+                    }
+
+                    class HoursReporter {
+                        calculateHours(employee: Employee): number { /* ... */ }
+                    }
+
+                    class StaffDirectory {
+                        fire(employee: Employee): void { /* ... */ }
+                    }
+                    ```
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## Open/closed principle (OCP)
+
+                    >A software artifact should be open for extension but closed for modification.
+
+                    --Uncle Bob
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## OCP - problem (1)
+
+                    ```
+                    class Logger {
+                        log(line: string): void {
+                            console.log(line);
+                        }
+                    }
+
+                    const logger = new Logger();
+                    logger.log('This is pretty terrific!');
+                    ```
+
+                    The developer proceeds to instrument the whole project with loggers.
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## OCP - problem (2)
+
+                    Boss says: *Let's also log to files!*
+
+                    ```
+                    class Logger {
+                        log(line: string): void {
+                            console.log(line);
+                            fs.appendFileSync('app.log', line);
+                        }
+                    }
+
+                    const logger = new Logger();
+                    logger.log('It goes into files. Oh my!');
+                    ```
+
+                    The frontend team had started to use `Logger` in the meantime.
+
+                    Their code is now broken.
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## OCP - solution (1)
+
+                    ```
+                    interface LogAppender {
+                        append(line: string): void;
+                    }
+
+                    class ConsoleAppender {
+                        append(line: string): void {
+                            console.log(line);
+                        }
+                    }
+
+                    class FileAppender {
+                        constructor(private path: string) {}
+
+                        append(line: string): void {
+                            fs.appendFileSync(this.path, line);
+                        }
+                    }
+                    ```
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## OCP - solution (2)
+
+                    ```
+                    class Logger {
+                        constructor(public appenders: LogAppender[]) {}
+
+                        log(line: string): void {
+                            this.appenders.forEach(appender => appender.append(line));
+                        }
+                    }
+
+                    const logger = new Logger([new ConsoleAppender()]);
+                    logger.log('Works for the web team again.');
+
+                    logger.appenders.push(new FileAppender('app.log'));
+                    logger.log('Now the backend team manager is happy too.');
+                    ```
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## Liskov substitution principle (LSP)
+
+                    >If S is declared subtype of T, objects of type S should behave as objects of type T are
+                    >expected to behave, if they are treated as objects of type T.
+
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## LSP - violation (1)
+
+                    ```
+                    class Rectangle {
+                        constructor(public width: number, public height: number) {}
+
+                        getArea() {
+                            return this.width * this.height;
+                        }
+                    }
+
+                    class Square extends Rectangle {
+                        constructor(public side: number) {
+                            super(side, side);
+                        }
+                    }
+                    ```
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## LSP - violation (2)
+
+                    ```
+                    const shape: Rectangle = new Square(2);
+                    console.log(shape.getArea()); // => 4
+
+                    shape.height = 10;
+                    console.log(shape.getArea()); // => 20 (!)
+                    ```
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## LSP - solution
+
+                    ```
+                    interface Shape {
+                        getArea(): number;
+                    }
+
+                    class Rectangle implements Shape {
+                        // Same as before.
+                    }
+
+                    class Square implements Shape {
+                        constructor(public side: number) {}
+
+                        getArea(): number {
+                            return this.side * this.side;
+                        }
+                    }
+                    ```
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## Interface segregation principle (ISP)
+
+                    >To each user of a shared component their own interface.
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## ISP
+
+                    * More of an issue for compiled languages.
+                      * Shared interface changes -> need to recompile all dependents.
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## Dependency inversion principle (DIP)
+
+                    * Don't refer to volatile concrete classes.
+                    * Don't derive from volatile concrete classes.
+                    * Don't override concrete functions.
+                    * Never mention the name of anything concrete and volatile.
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## DIP - example
+
+                    [This sounds familiar...](#/3/6)
+                </textarea>
+            </section>
+        </section>
+
+        <section>
+            <section data-markdown>
+                <textarea data-template>
+                    # Recap
+
+                    * Everybody is an architect.
+                    * Favor changeable and partially functioning over fully functioning, but barely changeable.
+                    * **S**ingle responsibility principle.
+                    * **O**pen/closed principle.
+                    * **L**iskov substitution principle.
+                    * **I**nterface segregation principle.
+                    * **D**ependency inversion principle.
+                    * So much more!
+                </textarea>
+            </section>
+        </section>
+
+        <section>
+            <section data-markdown>
+                <textarea data-template>
+                    # Further reading
+
+                    ![Clean Architecture](images/clean_architecture.jpeg)
+                    ![Clean Architecture](images/clean_code.jpg)
+                </textarea>
+            </section>
+        </section>
+
+        <section>
+            <section data-markdown data-background="images/cat.jpg">
+                <textarea data-template>
+                </textarea>
+            </section>
+        </section>
+    </div>
+</div>
+
+<script src="js/reveal.js"></script>
+
+<script>
+    // More info about config & dependencies:
+    // - https://github.com/hakimel/reveal.js#configuration
+    // - https://github.com/hakimel/reveal.js#dependencies
+    Reveal.initialize({
+        hash: true,
+        dependencies: [
+            {src: 'plugin/markdown/marked.js'},
+            {src: 'plugin/markdown/markdown.js'},
+            {src: 'plugin/notes/notes.js', async: true},
+            {src: 'plugin/highlight/highlight.js', async: true},
+            {src: 'plugin/reveal.js-menu-1.2.0/menu.js'}
+        ]
+    });
+</script>
+</body>
+</html>

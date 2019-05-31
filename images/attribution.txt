@@ -1,0 +1,13 @@
+* castle.jpg: https://commons.wikimedia.org/wiki/File:Burghausen_(121453231).jpeg
+* cat.jpg: https://commons.wikimedia.org/wiki/File:Computer-kitten.jpg
+* clean_architecture.jpeg: Robert C. Martin; Prentice Hall 2018
+* clean_code.jpg: Robert C. Martin; Prentice Hall 2009
+* criteria.svg: Self-made
+* criteria2.svg: Self-made
+* evolution.jpg: https://commons.wikimedia.org/wiki/File:Evolution-des-wissens.jpg
+* findologic.png: FINDOLOGIC GmbH
+* galaxy.jpg: https://
+en.wikipedia.org/wiki/Galaxy#/media/File:NGC_4414_(NASA-med).jpg
+* playhouse.jpg: https://pixabay.com/photos/playhouse-house-toys-212027/
+* space.jpg: https://commons.wikimedia.org/wiki/File:Astronaut-in-space.jpg
+* why.gif: https://www.reddit.com/r/perfectloops/comments/686n0u/a_triple_thinking/
