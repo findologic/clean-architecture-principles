@@ -83,6 +83,22 @@
 
             <section data-markdown>
                 <textarea data-template>
+                    ## Who is the architect?
+
+                    ![you are the architect](images/uncle_sam.png) <!-- .element: class="fragment" -->
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## Clean architecture is cheaper
+
+                    ![code cruft](images/cruft-impact.png)
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
                     ## Who is it for?
 
                     ![products](images/castle.jpg)
@@ -100,7 +116,7 @@
 
 
         <section>
-            <section data-markdown data-background="images/evolution.jpg" data-background-size="contain" class="title-slide">
+            <section data-markdown data-background="images/evolution.jpg" data-background-size="contain" class="evolution-slide">
                 <textarea data-template>
                     # The evolution of programming paradigms
                 </textarea>
@@ -159,20 +175,23 @@
                     ## OOP - problem
 
                     ```
-                    const eCommerceSystem: string = 'Shopware';
-                    let data: string[];
-
-                    switch (eCommerceSystem) {
-                        case 'Shopware':
-                            const exporter = new ShopwareExporter();
-                            data = exporter.getFeed();
-                            break;
-                        case 'Magento':
-                            const incompatibleFormat = getMagentoData();
-                            data = makeFeedCompatible(incompatibleFormat);
-                            break;
-                        // etc.
+                    class AnalyticsTracker {
+                        track(event: string): void { /* ... */ }
                     }
+                    class PiwikTracker {
+                        track(event: string): void { /* ... */ }
+                    }
+                    const analytics = new AnalyticsTracker();
+                    const piwik = new PiwikTracker();
+                    ```
+
+                    ```
+                    // Whenever tracking something in the code:
+                    if (window.ga && analytics != null) {
+                        analyticsTracker.track('foo');
+                    } else if (window._paq && piwik != null) {
+                        piwikTracker.track('foo');
+                    } else { /* Nothing to do. */ }
                     ```
                 </textarea>
             </section>
@@ -182,31 +201,29 @@
                     ## OOP - solution
 
                     ```
-                    abstract class Exporter {
-                        abstract export(): DataFeed;
-
-                        static getInstance(eCommerceSystem: string): DataFeed {
-                            switch (eCommerceSystem) {
-                                case 'Shopware':
-                                    return new ShopwareExporter();
-                                case 'Magento':
-                                    return new MagentoExporter();
-                                // etc.
+                    abstract class Tracker {
+                        abstract track(event: string);
+                        static getInstance(window: Window): Tracker {
+                            if (window.ga) {
+                                return new AnalyticsTracker();
+                            } else if (window._paq) {
+                                return new PiwikTracker();
+                            } else {
+                                return new DummyTracker();
                             }
                         }
                     }
 
-                    class ShopwareExporter extends Exporter {
-                        // ...
-                    }
+                    class AnalyticsTracker extends Tracker { /* ... */ }
+                    class PiwikTracker extends Tracker { /* ... */ }
+                    class DummyTracker extends Tracker { /* ... */ }
+                    ```
 
-                    class MagentoExporter extends Exporter {
-                        // ...
-                    }
+                    ```
+                    const tracker: Tracker = Tracker.getInstance(window);
 
-                    const eCommerceSystem: string = 'Shopware';
-                    const data = Exporter.getInstance(eCommerceSystem)
-                        .export();
+                    // Whenever tracking something in the code:
+                    tracker.track('foo');
                     ```
                 </textarea>
             </section>
@@ -540,6 +557,52 @@
                     ## DIP - example
 
                     [This sounds familiar...](#/3/6)
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## DIP - Angular (1)
+
+                    ```
+                    interface HelloService {
+                        sayHello(): string;
+                    }
+
+                    @Injectable({providedIn: 'root'})
+                    class ProdHelloService implements HelloService {
+                        sayHello(): string { return 'Hello, production!'; }
+                    }
+
+                    @Injectable({providedIn: 'root'})
+                    class DevHelloService implements HelloService {
+                        sayHello(): string { return 'Hello, development!'; }
+                    }
+                    ```
+                </textarea>
+            </section>
+
+            <section data-markdown>
+                <textarea data-template>
+                    ## DIP - Angular (2)
+
+                    ```
+                    @Component({
+                      providers: [
+                          {
+                              provide: HelloService,
+                              useFactory: () => {
+                                  if (environment.production) {
+                                      return new ProdHelloService();
+                                  } else {
+                                      return new DevHelloService();
+                                  }
+                              }
+                          }
+                      ]
+                    })
+                    class AppComponent { /* ... */ }
+                    ```
                 </textarea>
             </section>
         </section>
